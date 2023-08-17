@@ -22,7 +22,7 @@ fun Application.configureStatusPages() {
         call.respond(Response.Error("$cause ${cause.msg}",HttpStatusCode.Unauthorized.toString()))
         }
         exception<SessionDataIsNullException> {call, cause->
-            call.respond(Response.Error("$cause ",HttpStatusCode.Unauthorized.toString()))
+            call.respond(Response.Error("$cause ${cause.msg}",HttpStatusCode.Unauthorized.toString()))
         }
         exception<UserDoesNotExistsException> {call, cause->
             call.respond(Response.Error("$cause ",HttpStatusCode.Unauthorized.toString()))

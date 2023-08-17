@@ -16,9 +16,6 @@ fun main() {
 fun Application.module() {
     configureSerialization()
     DatabaseFactory.init()
-    Methods()
-    InterfaceAdminImpl()
-//    configureMonitoring()
     configureSecurity()
     configureStatusPages()
     configureRequestValidation()

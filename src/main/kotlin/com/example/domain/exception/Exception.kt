@@ -9,6 +9,6 @@ class UserDoesNotExistsException(val msg:String):RuntimeException()
 class PlayListNotFoundException(val msg:String):RuntimeException()
 class InvalidTokenException(val msg:String):RuntimeException()
 class InvalidUserNameOrPasswordException(val msg:String):RuntimeException()
-class SessionDataIsNullException:RuntimeException()
+class SessionDataIsNullException(val msg:String):RuntimeException()
 
 

@@ -5,6 +5,7 @@ import com.example.data.constants.APIConstantsUser.DELETE_ACCOUNT
 import com.example.data.constants.APIConstantsUser.FILTER_BY_ARTIST
 import com.example.data.constants.APIConstantsUser.REMOVE_FROM_PLAYLIST
 import com.example.data.constants.APIConstantsUser.USER_LOGIN
+import com.example.data.constants.APIConstantsUser.USER_LOGOUT
 import com.example.data.constants.APIConstantsUser.USER_REGISTRATION
 import com.example.data.constants.APIConstantsUser.USER_ROUTES
 import com.example.data.request.*
@@ -31,8 +32,8 @@ fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
             val input=call.receive<UserLogin>()
             val result=interfaceUserImpl.userLoginCheck(input.name,input.password)
             if(result.status==HttpStatusCode.Created.toString()){
-                call.sessions.clear<UserDetails>()
-                call.sessions.clear<UserData>()
+//                call.sessions.clear<UserDetails>()
+//                call.sessions.clear<UserData>()
                 call.sessions.set(UserDetails(input.name,input.password))
                 call.sessions.set(UserData(result.response,interfaceUserImpl.getUserId(input.name)))
             }
@@ -41,6 +42,7 @@ fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
         authenticate {
             get(FILTER_BY_ARTIST) {
                 val input = call.receive<ArtistData>()
+                call.sessions.get<UserData>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
                 val result = interfaceUserImpl.filterByArtist(input.artist)
                 call.respond(result)
             }
@@ -48,7 +50,7 @@ fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
         authenticate {
             post(ADD_TO_PLAYLIST) {
                 val input = call.receive<AddToPlayList>()
-                val sessionData=call.sessions.get<UserData>()?:throw SessionDataIsNullException()
+                val sessionData=call.sessions.get<UserData>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
                 val result = interfaceUserImpl.addToPlayList(input, sessionData.userId!!)
                 call.respond(result)
             }
@@ -56,14 +58,22 @@ fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
         authenticate {
             post(REMOVE_FROM_PLAYLIST) {
                 val input = call.receive<RemoveFromPlayList>()
-                val sessionData=call.sessions.get<UserData>()?:throw SessionDataIsNullException()
+                val sessionData=call.sessions.get<UserData>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
                 val result = interfaceUserImpl.removeFromPlayList(input, sessionData.userId!!)
                 call.respond(result)
             }
         }
         authenticate {
+            post(USER_LOGOUT){
+                call.sessions.clear<UserDetails>()
+                call.sessions.clear<UserData>()
+                call.respond("Logout Success")
+            }
+
+        }
+        authenticate {
             delete(DELETE_ACCOUNT) {
-                val input=call.sessions.get<UserDetails>()?:throw SessionDataIsNullException()
+                val input=call.sessions.get<UserDetails>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
                 val result=interfaceUserImpl.deleteAccount(input.name,input.password)
                 call.respond(result)
             }
