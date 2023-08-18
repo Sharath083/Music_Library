@@ -8,9 +8,11 @@ import com.example.data.constants.APIConstantsUser.USER_LOGIN
 import com.example.data.constants.APIConstantsUser.USER_LOGOUT
 import com.example.data.constants.APIConstantsUser.USER_REGISTRATION
 import com.example.data.constants.APIConstantsUser.USER_ROUTES
+import com.example.data.constants.APIConstantsUser.VIEW_PLAYLIST
 import com.example.data.request.*
-import com.example.data.sessiondata.UserData
+import com.example.data.response.Response
 import com.example.data.sessiondata.UserDetails
+import com.example.data.sessiondata.UserId
 import com.example.domain.controller.InterfaceUserImpl
 import com.example.domain.exception.SessionDataIsNullException
 import io.ktor.http.*
@@ -20,6 +22,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import org.h2.engine.User
 
 fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
     route(USER_ROUTES){
@@ -30,54 +33,55 @@ fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
         }
         post (USER_LOGIN){
             val input=call.receive<UserLogin>()
-            val result=interfaceUserImpl.userLoginCheck(input.name,input.password)
-            if(result.status==HttpStatusCode.Created.toString()){
+            val result=interfaceUserImpl.userLoginCheck(input.name!!,input.password!!)
+            if(result.status==HttpStatusCode.Accepted.toString()){
 //                call.sessions.clear<UserDetails>()
 //                call.sessions.clear<UserData>()
                 call.sessions.set(UserDetails(input.name,input.password))
-                call.sessions.set(UserData(result.response,interfaceUserImpl.getUserId(input.name)))
+                val userID=interfaceUserImpl.getUserId(input.name)
+                call.sessions.set(UserId(userID))
             }
             call.respond(result)
         }
-        authenticate {
-            get(FILTER_BY_ARTIST) {
-                val input = call.receive<ArtistData>()
-                call.sessions.get<UserData>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
-                val result = interfaceUserImpl.filterByArtist(input.artist)
-                call.respond(result)
-            }
+        get(FILTER_BY_ARTIST) {
+            val input = call.receive<ArtistData>()
+            call.sessions.get<UserId>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
+            val result = interfaceUserImpl.filterByArtist(input.artist!!)
+            call.respond(result)
         }
-        authenticate {
-            post(ADD_TO_PLAYLIST) {
-                val input = call.receive<AddToPlayList>()
-                val sessionData=call.sessions.get<UserData>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
-                val result = interfaceUserImpl.addToPlayList(input, sessionData.userId!!)
-                call.respond(result)
-            }
-        }
-        authenticate {
-            post(REMOVE_FROM_PLAYLIST) {
-                val input = call.receive<RemoveFromPlayList>()
-                val sessionData=call.sessions.get<UserData>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
-                val result = interfaceUserImpl.removeFromPlayList(input, sessionData.userId!!)
-                call.respond(result)
-            }
-        }
-        authenticate {
-            post(USER_LOGOUT){
-                call.sessions.clear<UserDetails>()
-                call.sessions.clear<UserData>()
-                call.respond("Logout Success")
-            }
 
+        post(ADD_TO_PLAYLIST) {
+            val input = call.receive<AddToPlayList>()
+            val sessionData=call.sessions.get<UserId>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
+            val result = interfaceUserImpl.addToPlayList(input, sessionData.userId!!)
+            call.respond(result)
         }
-        authenticate {
-            delete(DELETE_ACCOUNT) {
-                val input=call.sessions.get<UserDetails>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
-                val result=interfaceUserImpl.deleteAccount(input.name,input.password)
-                call.respond(result)
-            }
+        post(REMOVE_FROM_PLAYLIST) {
+            val input = call.receive<RemoveFromPlayList>()
+            val sessionData=call.sessions.get<UserId>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
+            val result = interfaceUserImpl.removeFromPlayList(input, sessionData.userId!!)
+            call.respond(result)
         }
+
+        post(VIEW_PLAYLIST) {
+            val input = call.receive<ViewPlayList>()
+            val sessionData=call.sessions.get<UserId>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
+            val result = interfaceUserImpl.viewPlayList(input.playlistName, sessionData.userId!!)
+            call.respond(result)
+        }
+
+        post(USER_LOGOUT){
+            call.sessions.clear<UserDetails>()
+            call.sessions.clear<UserId>()
+            call.respond(Response.Success("Logout Success",HttpStatusCode.Accepted.toString()))
+        }
+
+        delete(DELETE_ACCOUNT) {
+            val input=call.sessions.get<UserDetails>()?:throw SessionDataIsNullException("PLEASE LOGIN AGAIN ")
+            val result=interfaceUserImpl.deleteAccount(input.name,input.password)
+            call.respond(result)
+        }
+
 
     }
 

@@ -3,7 +3,7 @@ package com.example.domain.controller
 import com.example.data.request.DeleteSong
 import com.example.data.request.InputSong
 import com.example.data.response.Response
-import com.example.data.response.TokenResponse
+import com.example.data.response.LoginResponse
 import com.example.database.DatabaseFactory
 import com.example.database.table.SongsTable
 import com.example.utils.Methods
@@ -12,20 +12,19 @@ import com.example.domain.exception.SongAlreadyExistsException
 import com.example.domain.exception.SongNotFoundException
 import com.example.domain.interfaces.InterfaceAdmin
 import io.ktor.http.*
-import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class InterfaceAdminImpl(): InterfaceAdmin {
     private val rowMapping= RowMapping()
     private val methods= Methods()
-    override  fun adminLoginCheck(name:String, password:String):TokenResponse{
+    override  fun adminLoginCheck(name:String, password:String):LoginResponse{
         return if(name==("admin") && password=="1234"){
             val token=methods.tokenGeneratorAdmin()
-                TokenResponse(token,HttpStatusCode.Created.toString())
+                LoginResponse(token,HttpStatusCode.Created.toString())
         }
         else{
-            TokenResponse("Imposter",HttpStatusCode.Unauthorized.toString())
+            LoginResponse("Imposter",HttpStatusCode.Unauthorized.toString())
         }
     }
 
@@ -37,12 +36,12 @@ class InterfaceAdminImpl(): InterfaceAdmin {
 
     override suspend fun addSong(details: InputSong):Response<String>{
         return  try {
-            if (!checkSong(details.tittle!!,details.artist)) {
+            if (!checkSong(details.tittle!!,details.artist!!)) {
                 DatabaseFactory.dbQuery {
                     SongsTable.insert {
                         it[title] = details.tittle
                         it[artist] = details.artist
-                        it[duration] = details.duration
+                        it[duration] = details.duration!!
                     }
 
                 }

@@ -9,5 +9,5 @@ object APIConstantsUser {
     const val USER_LOGOUT="/logout"
     const val DELETE_ACCOUNT="/deleteAccount"
     const val FILTER_BY_ARTIST="/filterByArtist"
-
+    const val VIEW_PLAYLIST="/viewPlayList"
 }

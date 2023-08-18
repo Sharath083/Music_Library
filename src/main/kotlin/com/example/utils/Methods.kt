@@ -7,7 +7,7 @@ import io.ktor.server.application.*
 import java.util.*
 
 class Methods() {
-    private val secretUser = JWTData().secretUser
+//    private val secretUser = JWTData().secretUser
     private val secretAdmin = JWTData().secretAdmin
     private val issuer = JWTData().issuer
     private val audience = JWTData().audience
@@ -18,14 +18,14 @@ class Methods() {
             .withExpiresAt(Date(System.currentTimeMillis() + 600000))
             .sign(Algorithm.HMAC256(secretAdmin))
     }
-    fun tokenGeneratorUser(name:String):String{
-        return JWT.create()
-            .withAudience(audience)
-            .withIssuer(issuer)
-            .withClaim("user",name)
-            .withExpiresAt(Date(System.currentTimeMillis() + 600000))
-            .sign(Algorithm.HMAC256(secretUser))
-    }
+//    fun tokenGeneratorUser(name:String):String{
+//        return JWT.create()
+//            .withAudience(audience)
+//            .withIssuer(issuer)
+//            .withClaim("user",name)
+//            .withExpiresAt(Date(System.currentTimeMillis() + 600000))
+//            .sign(Algorithm.HMAC256(secretUser))
+//    }
     fun isValidEmail(email: String): Boolean {
         return email.matches(Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"))
     }

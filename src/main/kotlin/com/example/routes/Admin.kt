@@ -19,7 +19,7 @@ fun Route.adminFunctions(interfaceImpl: InterfaceAdminImpl){
 
         post(ADMIN_LOGIN) {
             val input=call.receive<AdminLogin>()
-            val result=interfaceImpl.adminLoginCheck(input.name,input.password)
+            val result=interfaceImpl.adminLoginCheck(input.name!!,input.password!!)
             call.respond(result)
         }
         authenticate("Admin") {
