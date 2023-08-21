@@ -2,8 +2,8 @@ package com.example.plugins
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.example.data.sessiondata.UserData
 import com.example.data.sessiondata.UserDetails
+import com.example.data.sessiondata.UserId
 import com.example.domain.exception.InvalidTokenException
 import com.example.utils.JWTData
 import io.ktor.server.application.*
@@ -16,10 +16,10 @@ fun Application.configureSecurity() {
     install(Sessions) {
         val secretEncryptKey = hex("00112233445566778899aabbccddeeff")
         val secretSignKey = hex("6819b57a326945c1968f45236589")
-        cookie<UserData>("user_session") {
+        cookie<UserId>("USER_ID") {
             transform(SessionTransportTransformerEncrypt(secretEncryptKey, secretSignKey))
         }
-        cookie<UserDetails>("user_session") {
+        cookie<UserDetails>("User_DETAILS") {
             transform(SessionTransportTransformerEncrypt(secretEncryptKey, secretSignKey))
         }
     }

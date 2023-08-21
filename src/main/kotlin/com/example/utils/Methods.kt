@@ -2,8 +2,6 @@ package com.example.utils
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.example.utils.JWTData
-import io.ktor.server.application.*
 import java.util.*
 
 class Methods() {

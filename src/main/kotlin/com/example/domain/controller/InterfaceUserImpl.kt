@@ -77,9 +77,9 @@ class InterfaceUserImpl: InterfaceUser {
         }
         return data.isEmpty()
     }
-    override suspend fun checkSongInPlayList(song: String,playList:String):Boolean{
+    override suspend fun checkSongInPlayList(song: String,playList:String,usersId:Int):Boolean{
         return DatabaseFactory.dbQuery {
-            PlayListTable.select(PlayListTable.songId eq getSongId(song) and(PlayListTable.playListName eq playList) ).map { rowMapping.mapPlayListDetails(it) }.isEmpty()
+            PlayListTable.select(PlayListTable.songId eq getSongId(song) and(PlayListTable.playListName eq playList) and(PlayListTable.userId eq usersId)).map { rowMapping.mapPlayListDetails(it) }.isEmpty()
         }
 
     }
@@ -171,7 +171,7 @@ class InterfaceUserImpl: InterfaceUser {
             if(!checkSongInDb(details.song!!)){
                 throw SongNotFoundException("Song Does Not Exists In DB")
             }
-            else if (checkSongInPlayList(details.song,details.playList!!) ) {
+            else if (checkSongInPlayList(details.song,details.playList!!,usersId) ) {
                 DatabaseFactory.dbQuery {
                     PlayListTable.insert {
                         it[userId]=usersId
@@ -198,7 +198,7 @@ class InterfaceUserImpl: InterfaceUser {
 
     override suspend fun removeFromPlayList(details: RemoveFromPlayList,usersId:Int): Response<String> {
         return try {
-            if (!checkSongInPlayList(details.song!!,details.playList!!) ) {
+            if (!checkSongInPlayList(details.song!!,details.playList!!,usersId) ) {
                 DatabaseFactory.dbQuery {
                     PlayListTable.deleteWhere {
                         songId eq getSongId(details.song) and (userId eq usersId) and(playListName eq details.playList)

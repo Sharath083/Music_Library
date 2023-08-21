@@ -17,7 +17,7 @@ interface InterfaceUser {
     suspend fun removeFromPlayList(details: RemoveFromPlayList,usersId:Int):Response<String>
     suspend fun deleteAccount(name:String, password:String): Response<String>
     suspend fun checkUser(name: String, email: String): Boolean
-    suspend fun checkSongInPlayList(song: String,playList:String):Boolean
+    suspend fun checkSongInPlayList(song: String,playList:String,usersId:Int):Boolean
     fun getSongId(song: String):Int
     suspend fun checkSongInDb(song: String):Boolean
     suspend fun viewPlayList(playList:String,userId:Int):Response<List<InputSong>>
