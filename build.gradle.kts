@@ -5,12 +5,18 @@ val logback_version: String by project
 val postgres_version: String by project
 val h2_version: String by project
 val exposed_version: String by project
+val koin_version:String by project
 
 
 plugins {
     kotlin("jvm") version "1.9.0"
     id("io.ktor.plugin") version "2.3.3"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    id("io.gitlab.arturbosch.detekt") version "1.18.1"
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 group = "com.example"
@@ -50,4 +56,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+
+
+
+    implementation("io.insert-koin:koin-ktor:$koin_version")
 }

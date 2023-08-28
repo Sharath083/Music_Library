@@ -1,7 +1,0 @@
-package com.example.data.request
-
-import kotlinx.serialization.Serializable
-
-@Serializable
-
-data class ViewPlayList(val playlistName:String?)

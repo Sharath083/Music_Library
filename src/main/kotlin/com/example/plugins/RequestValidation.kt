@@ -1,91 +1,87 @@
 package com.example.plugins
 
-import com.example.data.constants.APIConstantsExceptions.INVALID_ADMIN_LOGIN_DETAILS
-import com.example.data.constants.APIConstantsExceptions.INVALID_ARTIST
-import com.example.data.constants.APIConstantsExceptions.INVALID_DELETE_DATA
-import com.example.data.constants.APIConstantsExceptions.INVALID_DETAILS_OF_SONG
-import com.example.data.constants.APIConstantsExceptions.INVALID_LOGIN_DETAILS
-import com.example.data.constants.APIConstantsExceptions.INVALID_REGISTRATION
-import com.example.data.constants.APIConstantsExceptions.INVALID_SONG_DATA
-import com.example.data.constants.APIConstantsExceptions.INVALID_SONG_TO_REMOVE
-import com.example.data.constants.APIConstantsExceptions.PLAYLIST_NOT_VALID
-import com.example.data.request.*
-import com.example.domain.exception.InvalidInputException
-import com.example.utils.Methods
+import com.example.utils.appconstant.InfoMessage.PLAYLIST_NOT_VALID
+import com.example.data.model.*
+import com.example.domain.exception.*
+import com.example.utils.appconstant.InfoMessage.INVALID_Artist_Name
+import com.example.utils.appconstant.InfoMessage.INVALID_DURATION
+import com.example.utils.appconstant.InfoMessage.INVALID_EMAIL
+import com.example.utils.appconstant.InfoMessage.INVALID_EMAIL_FORMAT
+import com.example.utils.appconstant.InfoMessage.INVALID_NAME
+import com.example.utils.appconstant.InfoMessage.INVALID_PASSWORD
+import com.example.utils.appconstant.InfoMessage.INVALID_SONG_Name
+import com.example.utils.helperfunctions.HelperMethods
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
-import org.h2.engine.User
 
 fun Application.configureRequestValidation(){
 
+
     install(RequestValidation){
         validate<DeleteSong> {
-            if(it.artist=="" || it.artist==null || it.tittle=="" || it.tittle==null ){
-                throw InvalidInputException(INVALID_DELETE_DATA)
-            }
-            else{
-                ValidationResult.Valid
+            when{
+                it.artist.isNullOrBlank()->throw InvalidArtistException(INVALID_Artist_Name)
+                it.tittle.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
+                else->ValidationResult.Valid
             }
         }
         validate<InputSong> {
-            if(it.artist=="" || it.artist==null || it.tittle=="" || it.tittle==null||it.duration==""||it.duration==null){
-                throw InvalidInputException(INVALID_DETAILS_OF_SONG)
-            }
-            else{
-                ValidationResult.Valid
+            when{
+                it.artist.isNullOrBlank()->throw InvalidArtistException(INVALID_Artist_Name)
+                it.tittle.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
+                it.duration.isNullOrBlank()->throw InvalidDurationException(INVALID_DURATION)
+                else->ValidationResult.Valid
             }
         }
         validate<ArtistData> {
-            if(it.artist ==""||it.artist==null){
-                throw InvalidInputException(INVALID_ARTIST)
-            }
-            else{
-                ValidationResult.Valid
+            when {
+                it.artist.isNullOrBlank()->throw InvalidArtistException(INVALID_Artist_Name)
+                else -> ValidationResult.Valid
             }
         }
         validate<AddToPlayList> {
-            if(it.playList=="" || it.playList==null || it.song=="" || it.song==null){
-                throw InvalidInputException(INVALID_SONG_DATA)
-            }
-            else{
-                ValidationResult.Valid
+            when{
+                it.playList.isNullOrBlank()->throw InvalidPlayListException(PLAYLIST_NOT_VALID)
+                it.song.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
+                else->ValidationResult.Valid
             }
         }
         validate<RemoveFromPlayList> {
-            if(it.playList=="" || it.playList==null || it.song=="" || it.song==null){
-                throw InvalidInputException(INVALID_SONG_TO_REMOVE)
-            }
-            else{
-                ValidationResult.Valid
+            when{
+                it.playList.isNullOrBlank()->throw InvalidPlayListException(PLAYLIST_NOT_VALID)
+                it.song.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
+                else->ValidationResult.Valid
             }
         }
 
         validate<AdminLogin> {
-            if (it.name == "" || it.name == null || it.password == "" || it.password == null) {
-                throw InvalidInputException(INVALID_ADMIN_LOGIN_DETAILS)
-            } else {
-                ValidationResult.Valid
+            when{
+                it.name.isNullOrBlank()->throw InvalidNameException(INVALID_NAME)
+                it.password.isNullOrBlank()->throw InvalidPasswordException(INVALID_PASSWORD)
+                else->ValidationResult.Valid
             }
         }
         validate<UserRegistration> {
-            if (it.name == "" || it.name == null||it.email == "" || it.email == null|| !Methods().isValidEmail(it.email) || it.password == "" || it.password == null) {
-                throw InvalidInputException(INVALID_REGISTRATION)
-            } else {
-                ValidationResult.Valid
+            when{
+                it.name.isNullOrBlank()->throw InvalidNameException(INVALID_NAME)
+                it.password.isNullOrBlank()->throw InvalidPasswordException(INVALID_PASSWORD)
+                it.email.isNullOrBlank()->throw InvalidEmailException(INVALID_EMAIL)
+                !HelperMethods().isValidEmail(it.email)->throw InvalidEmailException(INVALID_EMAIL_FORMAT)
+                else->ValidationResult.Valid
             }
+
         }
         validate<UserLogin> {
-            if (it.name == "" || it.name == null || it.password == "" || it.password == null) {
-                throw InvalidInputException(INVALID_LOGIN_DETAILS)
-            } else {
-                ValidationResult.Valid
+            when{
+                it.name.isNullOrBlank()->throw InvalidNameException(INVALID_NAME)
+                it.password.isNullOrBlank()->throw InvalidPasswordException(INVALID_PASSWORD)
+                else->ValidationResult.Valid
             }
         }
         validate<ViewPlayList> {
-            if (it.playlistName == "" || it.playlistName == null) {
-                throw InvalidInputException(PLAYLIST_NOT_VALID)
-            } else {
-                ValidationResult.Valid
+            when{
+                it.playlistName.isNullOrBlank()->throw InvalidPlayListException(PLAYLIST_NOT_VALID)
+                else->ValidationResult.Valid
             }
         }
     }

@@ -1,29 +1,30 @@
 package com.example.routes
 
-import com.example.data.constants.APIConstantsExceptions.SESSION_MESSAGE
-import com.example.data.constants.APIConstantsUser.ADD_TO_PLAYLIST
-import com.example.data.constants.APIConstantsUser.DELETE_ACCOUNT
-import com.example.data.constants.APIConstantsUser.FILTER_BY_ARTIST
-import com.example.data.constants.APIConstantsUser.REMOVE_FROM_PLAYLIST
-import com.example.data.constants.APIConstantsUser.USER_LOGIN
-import com.example.data.constants.APIConstantsUser.USER_LOGOUT
-import com.example.data.constants.APIConstantsUser.USER_REGISTRATION
-import com.example.data.constants.APIConstantsUser.USER_ROUTES
-import com.example.data.constants.APIConstantsUser.VIEW_PLAYLIST
-import com.example.data.request.*
-import com.example.data.response.Response
-import com.example.data.sessiondata.UserDetails
-import com.example.data.sessiondata.UserId
-import com.example.domain.controller.InterfaceUserImpl
+import com.example.utils.appconstant.InfoMessage.SESSION_MESSAGE
+import com.example.data.model.*
+import com.example.data.model.Response
+import com.example.data.model.UserId
+import com.example.data.repositories.InterfaceUserImpl
 import com.example.domain.exception.SessionDataIsNullException
+import com.example.utils.appconstant.APIEndPoints.ADD_TO_PLAYLIST
+import com.example.utils.appconstant.APIEndPoints.DELETE_ACCOUNT
+import com.example.utils.appconstant.APIEndPoints.FILTER_BY_ARTIST
+import com.example.utils.appconstant.APIEndPoints.REMOVE_FROM_PLAYLIST
+import com.example.utils.appconstant.APIEndPoints.USER_LOGIN
+import com.example.utils.appconstant.APIEndPoints.USER_LOGOUT
+import com.example.utils.appconstant.APIEndPoints.USER_REGISTRATION
+import com.example.utils.appconstant.APIEndPoints.USER_ROUTES
+import com.example.utils.appconstant.APIEndPoints.VIEW_PLAYLIST
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import org.koin.ktor.ext.inject
 
-fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
+fun Route.userRouting(){
+    val interfaceUserImpl: InterfaceUserImpl by inject()
     route(USER_ROUTES){
         post(USER_REGISTRATION) {
             val regValues=call.receive<UserRegistration>()
@@ -34,10 +35,10 @@ fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
             val input=call.receive<UserLogin>()
             val result=interfaceUserImpl.userLoginCheck(input.name!!,input.password!!)
             if(result.status==HttpStatusCode.Accepted.toString()){
-                call.sessions.set(UserDetails(input.name,input.password))
-                call.sessions.set(UserId(interfaceUserImpl.getUserId(input.name)))
+                val id=interfaceUserImpl.getUserId(input.name)
+                call.sessions.set(UserId(id))
             }
-            call.respond("$result")
+            call.respond(result)
         }
         get(FILTER_BY_ARTIST) {
             val input = call.receive<ArtistData>()
@@ -67,14 +68,13 @@ fun Route.userRouting(interfaceUserImpl: InterfaceUserImpl){
         }
 
         post(USER_LOGOUT){
-            call.sessions.clear<UserDetails>()
             call.sessions.clear<UserId>()
             call.respond(Response.Success("Logout Success",HttpStatusCode.Accepted.toString()))
         }
 
         delete(DELETE_ACCOUNT) {
-            val input=call.sessions.get<UserDetails>()?:throw SessionDataIsNullException(SESSION_MESSAGE)
-            val result=interfaceUserImpl.deleteAccount(input.name,input.password)
+            val input=call.sessions.get<UserId>()?:throw SessionDataIsNullException(SESSION_MESSAGE)
+            val result=interfaceUserImpl.deleteAccount(input.userId!!)
             call.respond(result)
         }
 

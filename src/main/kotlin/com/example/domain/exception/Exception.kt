@@ -12,3 +12,17 @@ class InvalidUserNameOrPasswordException(val msg:String):RuntimeException()
 class SessionDataIsNullException(val msg:String):RuntimeException()
 
 
+
+//RequestValidation
+class InvalidNameException(val msg:String):RuntimeException()
+class InvalidPasswordException(val msg:String):RuntimeException()
+class InvalidEmailException(val msg:String):RuntimeException()
+class InvalidArtistException(val msg:String):RuntimeException()
+class InvalidSongException(val msg:String):RuntimeException()
+class InvalidDurationException(val msg:String):RuntimeException()
+class InvalidPlayListException(val msg:String):RuntimeException()
+
+
+
+
+

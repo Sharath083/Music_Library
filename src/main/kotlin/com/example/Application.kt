@@ -1,8 +1,6 @@
 package com.example
 
-import com.example.database.DatabaseFactory
-import com.example.utils.Methods
-import com.example.domain.controller.InterfaceAdminImpl
+import com.example.data.DatabaseFactory
 import com.example.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -20,5 +18,6 @@ fun Application.module() {
     configureStatusPages()
     configureRequestValidation()
     configureRouting()
+    configureKoin()
 }
     
