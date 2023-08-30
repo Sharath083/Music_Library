@@ -1,16 +1,10 @@
 package com.example.plugins
 
-import com.example.utils.appconstant.InfoMessage.PLAYLIST_NOT_VALID
 import com.example.data.model.*
-import com.example.domain.exception.*
-import com.example.utils.appconstant.InfoMessage.INVALID_Artist_Name
-import com.example.utils.appconstant.InfoMessage.INVALID_DURATION
-import com.example.utils.appconstant.InfoMessage.INVALID_EMAIL
-import com.example.utils.appconstant.InfoMessage.INVALID_EMAIL_FORMAT
-import com.example.utils.appconstant.InfoMessage.INVALID_NAME
-import com.example.utils.appconstant.InfoMessage.INVALID_PASSWORD
-import com.example.utils.appconstant.InfoMessage.INVALID_SONG_Name
+import com.example.service.UserServices
+import com.example.utils.*
 import com.example.utils.helperfunctions.HelperMethods
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
 
@@ -20,67 +14,67 @@ fun Application.configureRequestValidation(){
     install(RequestValidation){
         validate<DeleteSong> {
             when{
-                it.artist.isNullOrBlank()->throw InvalidArtistException(INVALID_Artist_Name)
-                it.tittle.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
+                it.artist.isNullOrBlank()->throw InvalidArtistException(HttpStatusCode.BadRequest)
+                it.tittle.isNullOrBlank()->throw InvalidSongException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
         }
         validate<InputSong> {
             when{
-                it.artist.isNullOrBlank()->throw InvalidArtistException(INVALID_Artist_Name)
-                it.tittle.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
-                it.duration.isNullOrBlank()->throw InvalidDurationException(INVALID_DURATION)
+                it.artist.isNullOrBlank()->throw InvalidArtistException(HttpStatusCode.BadRequest)
+                it.tittle.isNullOrBlank()->throw InvalidSongException(HttpStatusCode.BadRequest)
+                it.duration.isNullOrBlank()->throw InvalidDurationException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
         }
         validate<ArtistData> {
             when {
-                it.artist.isNullOrBlank()->throw InvalidArtistException(INVALID_Artist_Name)
+                it.artist.isNullOrBlank()->throw InvalidArtistException(HttpStatusCode.BadRequest)
                 else -> ValidationResult.Valid
             }
         }
         validate<AddToPlayList> {
             when{
-                it.playList.isNullOrBlank()->throw InvalidPlayListException(PLAYLIST_NOT_VALID)
-                it.song.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
+                it.playList.isNullOrBlank()->throw InvalidPlayListException(HttpStatusCode.BadRequest)
+                it.song.isNullOrBlank()->throw InvalidSongException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
         }
         validate<RemoveFromPlayList> {
             when{
-                it.playList.isNullOrBlank()->throw InvalidPlayListException(PLAYLIST_NOT_VALID)
-                it.song.isNullOrBlank()->throw InvalidSongException(INVALID_SONG_Name)
+                it.playList.isNullOrBlank()->throw InvalidPlayListException(HttpStatusCode.BadRequest)
+                it.song.isNullOrBlank()->throw InvalidSongException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
         }
 
         validate<AdminLogin> {
             when{
-                it.name.isNullOrBlank()->throw InvalidNameException(INVALID_NAME)
-                it.password.isNullOrBlank()->throw InvalidPasswordException(INVALID_PASSWORD)
+                it.name!!.isBlank() ->throw InvalidNameException(HttpStatusCode.BadRequest)
+                it.password.isNullOrBlank()->throw InvalidPasswordException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
         }
         validate<UserRegistration> {
             when{
-                it.name.isNullOrBlank()->throw InvalidNameException(INVALID_NAME)
-                it.password.isNullOrBlank()->throw InvalidPasswordException(INVALID_PASSWORD)
-                it.email.isNullOrBlank()->throw InvalidEmailException(INVALID_EMAIL)
-                !HelperMethods().isValidEmail(it.email)->throw InvalidEmailException(INVALID_EMAIL_FORMAT)
+                it.name.isNullOrBlank()->throw InvalidNameException(HttpStatusCode.BadRequest)
+                it.password.isNullOrBlank()->throw InvalidPasswordException(HttpStatusCode.BadRequest)
+                it.email.isNullOrBlank()->throw InvalidEmailException(HttpStatusCode.BadRequest)
+                !UserServices().isValidEmail(it.email)->throw InvalidEmailFormatException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
 
         }
         validate<UserLogin> {
             when{
-                it.name.isNullOrBlank()->throw InvalidNameException(INVALID_NAME)
-                it.password.isNullOrBlank()->throw InvalidPasswordException(INVALID_PASSWORD)
+                it.name.isNullOrBlank()->throw InvalidNameException(HttpStatusCode.BadRequest)
+                it.password.isNullOrBlank()->throw InvalidPasswordException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
         }
         validate<ViewPlayList> {
             when{
-                it.playlistName.isNullOrBlank()->throw InvalidPlayListException(PLAYLIST_NOT_VALID)
+                it.playlistName.isNullOrBlank()->throw InvalidPlayListException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
         }

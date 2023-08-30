@@ -1,8 +1,8 @@
 package com.example.di
 
 
-import com.example.data.repositories.InterfaceAdminImpl
-import com.example.data.repositories.InterfaceUserImpl
+import com.example.repositories.InterfaceAdminImpl
+import com.example.repositories.InterfaceUserImpl
 
 import org.koin.dsl.module
 

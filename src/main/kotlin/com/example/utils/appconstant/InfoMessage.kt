@@ -1,5 +1,7 @@
 package com.example.utils.appconstant
 
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Unknown
+
 object InfoMessage {
     const val SESSION_MESSAGE = "Session Has Expired .PLEASE LOGIN AGAIN"
     const val INVALID_LOGIN_DETAILS = "Give Proper UserName and Password"
@@ -8,6 +10,7 @@ object InfoMessage {
     const val INVALID_PASSWORD="Password field should not be empty"
     const val INVALID_EMAIL="Email field should not be empty "
     const val INVALID_EMAIL_FORMAT="Invalid email address format"
+    const val UNKNOWN_ERROR="Something Went Wrong"
 
 
 
@@ -16,7 +19,7 @@ object InfoMessage {
 
     const val INVALID_DELETE_DATA = "Give Proper Input To Delete"
     const val INVALID_Artist_Name = "Give Artist Name In Proper Format"
-    const val INVALID_SONG_Name = "Give Song Name In Proper Format"
+    const val INVALID_SONG_NAME = "Give Song Name In Proper Format"
     const val INVALID_DURATION = "Give Duration In Proper Format"
     const val PLAYLIST_NOT_VALID = "Give Proper PlayList Name To View PlayList"
 

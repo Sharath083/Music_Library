@@ -3,8 +3,9 @@ package com.example.plugins
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.data.model.UserId
-import com.example.domain.exception.InvalidTokenException
+import com.example.utils.InvalidTokenException
 import com.example.utils.helperfunctions.JWTData
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -36,7 +37,7 @@ fun Application.configureSecurity() {
                 if (credential.payload.audience.contains(audience)) JWTPrincipal(credential.payload) else null
             }
             challenge { _, _ ->
-                throw InvalidTokenException("The token is invalid or Expired")
+                throw InvalidTokenException("The token is invalid or Expired", HttpStatusCode.BadRequest)
             }
         }
     }
