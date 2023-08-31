@@ -1,7 +1,7 @@
 package com.example.plugins
 
 import com.example.data.model.*
-import com.example.service.UserServices
+import com.example.di.service.UserServices
 import com.example.utils.*
 import com.example.utils.helperfunctions.HelperMethods
 import io.ktor.http.*

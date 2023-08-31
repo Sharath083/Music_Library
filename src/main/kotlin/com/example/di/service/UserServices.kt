@@ -1,4 +1,4 @@
-package com.example.service
+package com.example.di.service
 
 import com.example.data.model.SuccessResponse
 import com.example.utils.helperfunctions.HelperMethods

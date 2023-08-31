@@ -1,4 +1,4 @@
-package com.example.service
+package com.example.di.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
@@ -12,15 +12,7 @@ class AdminServices {
     private val secretAdmin = JWTData.secretAdmin
     private val issuer = JWTData.issuer
     private val audience = JWTData.audience
-    fun adminLoginCheck(name:String, password:String): SuccessResponse {
-        return if(name==("admin") && password=="1234"){
-            val token=tokenGeneratorAdmin()
-            SuccessResponse(token, HttpStatusCode.Created.toString())
-        }
-        else{
-            throw InvalidLoginForAdminException("Imposter", HttpStatusCode.Unauthorized)
-        }
-    }
+
     fun tokenGeneratorAdmin(): String {
         return JWT.create()
             .withAudience(audience)

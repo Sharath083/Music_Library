@@ -5,11 +5,11 @@ import com.example.data.model.InputSong
 import com.example.data.model.SuccessResponse
 import com.example.data.DatabaseFactory
 import com.example.data.schemas.SongsTable
-import com.example.utils.helperfunctions.HelperMethods
 import com.example.utils.helperfunctions.RowMapping
 import com.example.utils.SongAlreadyExistsException
 import com.example.utils.SongNotFoundException
 import com.example.dao.InterfaceAdmin
+import com.example.di.service.AdminServices
 import com.example.utils.InvalidLoginForAdminException
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
@@ -17,6 +17,15 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class InterfaceAdminImpl: InterfaceAdmin {
     private val rowMapping= RowMapping()
+    override fun adminLoginCheck(name:String, password:String): SuccessResponse {
+        return if(name==("admin") && password=="1234"){
+            val token=AdminServices().tokenGeneratorAdmin()
+            SuccessResponse(token, HttpStatusCode.Created.toString())
+        }
+        else{
+            throw InvalidLoginForAdminException("Imposter", HttpStatusCode.Unauthorized)
+        }
+    }
 
     override suspend fun checkSong(song: String,artist:String):Boolean{
         return DatabaseFactory.dbQuery {
