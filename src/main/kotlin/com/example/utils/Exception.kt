@@ -12,6 +12,8 @@ class InvalidTokenException(val msg:String,val statusCode: HttpStatusCode):Runti
 class InvalidUserNameOrPasswordException(val msg:String,val statusCode: HttpStatusCode):RuntimeException()
 class SessionDataIsNullException(val msg:String,val statusCode: HttpStatusCode):RuntimeException()
 class InvalidLoginForAdminException(val msg:String,val statusCode: HttpStatusCode):RuntimeException()
+class SomethingWentWrongException(val msg:String,val statusCode: HttpStatusCode):RuntimeException()
+
 
 
 

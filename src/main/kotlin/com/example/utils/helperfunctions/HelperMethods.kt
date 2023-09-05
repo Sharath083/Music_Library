@@ -1,12 +1,7 @@
 package com.example.utils.helperfunctions
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import java.util.*
-
-class HelperMethods() {
-//    private val secretUser = JWTData().secretUser
-
-
-
+class HelperMethods {
+    fun isValidEmail(email: String): Boolean {
+        return email.matches(Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"))
+    }
 }

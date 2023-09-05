@@ -11,6 +11,9 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import java.sql.SQLException
 import java.util.InputMismatchException
 
+fun statusHelper(message:String,msgId:Int, status:String):ExceptionResponse{
+    return ExceptionResponse(message,msgId,status)
+}
 fun Application.configureStatusPages() {
     install(StatusPages) {
         var statusCode:HttpStatusCode
@@ -24,8 +27,7 @@ fun Application.configureStatusPages() {
                 is InvalidNameException->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_NAME
-                    status=cause.statusCode.toString()
-                }
+                    status=cause.statusCode.toString()                }
                 is InvalidArtistException->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_Artist_Name
@@ -63,6 +65,11 @@ fun Application.configureStatusPages() {
                 }
                 //Routes Exceptions
                 is InvalidLoginForAdminException->{
+                    statusCode=cause.statusCode
+                    message= cause.msg
+                    status=cause.statusCode.toString()
+                }
+                is SomethingWentWrongException->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()

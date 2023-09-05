@@ -1,3 +1,5 @@
 package com.example.data.model
 
-data class UserId(val userId:Int?)
+import java.util.UUID
+
+data class UserId(val userId:UUID?)

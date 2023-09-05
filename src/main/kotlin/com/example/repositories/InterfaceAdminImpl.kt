@@ -9,7 +9,7 @@ import com.example.utils.helperfunctions.RowMapping
 import com.example.utils.SongAlreadyExistsException
 import com.example.utils.SongNotFoundException
 import com.example.dao.InterfaceAdmin
-import com.example.di.service.AdminServices
+import com.example.service.AdminServices
 import com.example.utils.InvalidLoginForAdminException
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
@@ -19,7 +19,7 @@ class InterfaceAdminImpl: InterfaceAdmin {
     private val rowMapping= RowMapping()
     override fun adminLoginCheck(name:String, password:String): SuccessResponse {
         return if(name==("admin") && password=="1234"){
-            val token=AdminServices().tokenGeneratorAdmin()
+            val token= AdminServices().tokenGeneratorAdmin()
             SuccessResponse(token, HttpStatusCode.Created.toString())
         }
         else{

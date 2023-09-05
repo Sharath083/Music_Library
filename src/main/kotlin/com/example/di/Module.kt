@@ -1,17 +1,25 @@
 package com.example.di
 
 
-import com.example.repositories.InterfaceAdminImpl
-import com.example.repositories.InterfaceUserImpl
+import com.example.dao.AdminInterface
+import com.example.dao.UserInterface
+import com.example.repositories.AdminInterfaceImpl
+import com.example.repositories.UserInterfaceImpl
+import com.example.service.UserServices
+import com.example.service.AdminServices
+
+
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.bind
+import org.koin.dsl.bind
 
 import org.koin.dsl.module
 
 
 val myModule = module {
-    single<InterfaceAdminImpl> {
-        InterfaceAdminImpl()
-    }
-    single<InterfaceUserImpl> {
-        InterfaceUserImpl()
-    }
+    singleOf(::AdminInterfaceImpl) {bind<AdminInterface>()}
+    singleOf(::UserInterfaceImpl) {bind<UserInterface>()}
+    singleOf(::AdminServices)
+    singleOf(::UserServices)
+
 }

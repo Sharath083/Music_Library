@@ -4,6 +4,7 @@ import com.example.utils.appconstant.InfoMessage.SESSION_MESSAGE
 import com.example.data.model.*
 import com.example.data.model.UserId
 import com.example.repositories.InterfaceUserImpl
+import com.example.service.UserServices
 import com.example.utils.SessionDataIsNullException
 import com.example.utils.appconstant.APIEndPoints.ADD_TO_PLAYLIST
 import com.example.utils.appconstant.APIEndPoints.DELETE_ACCOUNT
@@ -23,19 +24,19 @@ import io.ktor.server.sessions.*
 import org.koin.ktor.ext.inject
 
 fun Route.userRouting(){
-    val interfaceUserImpl: InterfaceUserImpl by inject()
+    val userServices: UserServices by inject()
     route(USER_ROUTES){
         post(USER_REGISTRATION) {
             val regValues=call.receive<UserRegistration>()
-            interfaceUserImpl.userRegistration(regValues)
+            userServices.userRegistrationService(regValues)
                 .apply {
                     call.respond(HttpStatusCode.OK,this) }
         }
         post (USER_LOGIN){
             val input=call.receive<UserLogin>()
-            interfaceUserImpl.userLoginCheck(input.name!!,input.password!!)
+            userServices.userLoginCheckService(input.name!!,input.password!!)
                 .apply {
-                    val id = interfaceUserImpl.getUserId(input.name)
+                    val id = userServices.getUserIdService(input.name)
                     call.sessions.set(UserId(id))
                     call.respond(HttpStatusCode.Created, this)
                 }
@@ -46,7 +47,7 @@ fun Route.userRouting(){
             val input = call.receive<ArtistData>()
             call.sessions.get<UserId>()
                 ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            interfaceUserImpl.filterByArtist(input.artist!!)
+            userServices.filterByArtistService(input.artist!!)
                 .apply {
                     call.respond(HttpStatusCode.OK,this) }
         }
@@ -55,7 +56,7 @@ fun Route.userRouting(){
             val input = call.receive<AddToPlayList>()
             val sessionData=call.sessions.get<UserId>()
                 ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            interfaceUserImpl.addToPlayList(input, sessionData.userId!!)
+            userServices.addToPlayList(input, sessionData.userId!!)
                 .apply {
                     call.respond(HttpStatusCode.OK,this) }
         }
@@ -63,7 +64,7 @@ fun Route.userRouting(){
             val input = call.receive<RemoveFromPlayList>()
             val sessionData=call.sessions.get<UserId>()
                 ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            interfaceUserImpl.removeFromPlayList(input, sessionData.userId!!)
+            userServices.removeFromPlayListService(input, sessionData.userId!!)
                 .apply {
                     call.respond(HttpStatusCode.OK,this) }
         }
@@ -71,7 +72,7 @@ fun Route.userRouting(){
         get(VIEW_PLAYLIST) {
             val input = call.receive<ViewPlayList>()
             val sessionData=call.sessions.get<UserId>()?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            interfaceUserImpl.viewPlayList(input.playlistName!!, sessionData.userId!!)
+            userServices.viewPlayListService(input.playlistName!!, sessionData.userId!!)
                 .apply {
                     call.respond(HttpStatusCode.OK,this) }        }
 
@@ -83,7 +84,7 @@ fun Route.userRouting(){
         delete(DELETE_ACCOUNT) {
             val input=call.sessions.get<UserId>()
                 ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            interfaceUserImpl.deleteAccount(input.userId!!)
+            userServices.deleteAccountService(input.userId!!)
                 .apply {
                     call.sessions.clear<UserId>()
                     call.respond(HttpStatusCode.OK,this)

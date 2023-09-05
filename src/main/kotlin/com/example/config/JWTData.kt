@@ -1,15 +1,10 @@
-package com.example.utils.helperfunctions
+package com.example.config
 
-import io.ktor.server.application.*
 import io.ktor.server.config.*
 import com.typesafe.config.ConfigFactory
 
 object JWTData{
-//    val secretUser = "login user"
-//    val secretAdmin = "admin login"
-//    val issuer = "http://0.0.0.0:8080/"
-//    val audience = "http://0.0.0.0:8080/hello"
-//    val realm = "Unauthorized"
+
     private val config=HoconApplicationConfig(ConfigFactory.load())
 
 

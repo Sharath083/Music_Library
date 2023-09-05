@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.data.model.UserId
 import com.example.utils.InvalidTokenException
-import com.example.utils.helperfunctions.JWTData
+import com.example.config.JWTData
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

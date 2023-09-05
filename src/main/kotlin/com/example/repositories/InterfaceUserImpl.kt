@@ -11,7 +11,6 @@ import com.example.utils.*
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import java.sql.SQLException
 
 class InterfaceUserImpl: InterfaceUser {
     private val rowMapping= RowMapping()
@@ -39,16 +38,16 @@ class InterfaceUserImpl: InterfaceUser {
         }
     }
     override suspend fun deleteAccount(userId: Int): SuccessResponse {
-            val result= DatabaseFactory.dbQuery {
-                PlayListTable.deleteWhere { PlayListTable.userId eq userId }
-                UserTable.deleteWhere {UserTable.id eq userId }
-            }
-            return if(result>0){
-                SuccessResponse("Account Has Deleted",HttpStatusCode.Accepted.toString())
-            }
-            else{
-                throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
-            }
+        val result= DatabaseFactory.dbQuery {
+            PlayListTable.deleteWhere { PlayListTable.userId eq userId }
+            UserTable.deleteWhere {UserTable.id eq userId }
+        }
+        return if(result>0){
+            SuccessResponse("Account Has Deleted",HttpStatusCode.Accepted.toString())
+        }
+        else{
+            throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
+        }
     }
     override suspend fun checkUser(name: String, email: String): Boolean {
         val data = DatabaseFactory.dbQuery {
@@ -135,16 +134,17 @@ class InterfaceUserImpl: InterfaceUser {
     }
 
     override suspend fun removeFromPlayList(details: RemoveFromPlayList,usersId:Int): SuccessResponse {
-            return if (!checkSongInPlayList(details.song!!,details.playList!!,usersId) ) {
-                DatabaseFactory.dbQuery {
-                    PlayListTable.deleteWhere {
-                        songId eq getSongId(details.song) and (userId eq usersId) and(playListName eq details.playList)
-                    }
+
+        return if (!checkSongInPlayList(details.song!!,details.playList!!,usersId) ) {
+            DatabaseFactory.dbQuery {
+                PlayListTable.deleteWhere {
+                    songId eq getSongId(details.song) and (userId eq usersId) and(playListName eq details.playList)
                 }
-                SuccessResponse("Song ${details.song} Has Removed From PlayList ${details.playList}",HttpStatusCode.Accepted.toString())
             }
-            else{
-                throw SongNotFoundException("${details.song } Does Not Exists in PlayList",HttpStatusCode.BadRequest)
-            }
+            SuccessResponse("Song ${details.song} Has Removed From PlayList ${details.playList}",HttpStatusCode.Accepted.toString())
+        }
+        else{
+            throw SongNotFoundException("${details.song } Does Not Exists in PlayList",HttpStatusCode.BadRequest)
+        }
     }
 }

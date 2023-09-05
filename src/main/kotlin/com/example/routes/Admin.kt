@@ -7,7 +7,9 @@ import com.example.utils.appconstant.APIEndPoints.REMOVE_SONG
 import com.example.data.model.AdminLogin
 import com.example.data.model.DeleteSong
 import com.example.data.model.InputSong
+import com.example.repositories.AdminInterfaceImpl
 import com.example.repositories.InterfaceAdminImpl
+import com.example.service.AdminServices
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -17,24 +19,24 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
 fun Route.adminFunctions(){
-    val interfaceImpl: InterfaceAdminImpl by inject()
+    val adminServices: AdminServices by inject()
     route(ADMIN_ROUTES){
 
         post(ADMIN_LOGIN) {
             val input=call.receive<AdminLogin>()
-            interfaceImpl.adminLoginCheck(input.name!!,input.password!!)
+            adminServices.adminLoginService(input.name!!,input.password!!)
                 .apply { call.respond(HttpStatusCode.Created, this)}
 
         }
         authenticate("Admin") {
             post(ADD_NEW_SONG) {
                 val input = call.receive<InputSong>()
-                interfaceImpl.addSong(input)
+                adminServices.songAddService(input)
                     .apply { call.respond(HttpStatusCode.Accepted, this)}
             }
             delete(REMOVE_SONG) {
                 val input = call.receive<DeleteSong>()
-                interfaceImpl.deleteSong(input)
+                adminServices.deleteSongService(input)
                     .apply { call.respond(HttpStatusCode.Accepted, this)}
             }
         }

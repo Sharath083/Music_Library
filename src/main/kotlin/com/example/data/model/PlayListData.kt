@@ -1,6 +1,9 @@
 package com.example.data.model
 
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 data class PlayListData(val userId:Int,val playListName:String,val songId:Int)
+@Serializable
+data class PlayListDatas(val userId:String,val playListName:String,val songId:String)
