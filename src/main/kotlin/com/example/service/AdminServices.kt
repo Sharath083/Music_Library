@@ -10,6 +10,7 @@ import com.example.utils.InvalidLoginForAdminException
 import com.example.utils.SongAlreadyExistsException
 import com.example.utils.SongNotFoundException
 import com.example.config.JWTData
+import com.example.data.model.BaseResponse
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -29,25 +30,27 @@ class AdminServices: KoinComponent {
             .sign(Algorithm.HMAC256(secretAdmin))
     }
 
-    fun adminLoginService(name: String, password: String):SuccessResponse{
+    fun adminLoginService(name: String, password: String):BaseResponse{
         return if(adminInterfaceImpl.adminLoginCheck(name,password)){
-            SuccessResponse(tokenGeneratorAdmin(), HttpStatusCode.Created.toString())
+            BaseResponse.SuccessResponse(tokenGeneratorAdmin(), HttpStatusCode.Created.toString())
         }
         else{
             throw InvalidLoginForAdminException("Imposter", HttpStatusCode.Unauthorized)
         }
     }
-    suspend fun songAddService(details: InputSong):SuccessResponse{
+    suspend fun songAddService(details: InputSong):BaseResponse{
         return if(adminInterfaceImpl.addSong(details)){
-            SuccessResponse("Song ${details.tittle} Has Added", HttpStatusCode.Accepted.toString())
+            BaseResponse.SuccessResponse("Song ${details.tittle} Has Added", HttpStatusCode.Accepted.toString())
         }
         else{
             throw SongAlreadyExistsException(msg="Song ${details.tittle} Already Exists",HttpStatusCode.BadRequest)
         }
     }
-    suspend fun deleteSongService(details: DeleteSong):SuccessResponse {
-        return if (adminInterfaceImpl.checkSong(details.tittle!!, details.artist!!) && adminInterfaceImpl.deleteSong(details)) {
-            SuccessResponse("${details.tittle} Has Deleted ", HttpStatusCode.Accepted.toString())
+    suspend fun deleteSongService(details: DeleteSong):BaseResponse {
+        return if (adminInterfaceImpl.checkSong(details.tittle!!, details.artist!!)
+            && adminInterfaceImpl.getSongId(details)!=null ) {
+            adminInterfaceImpl.deleteSong(details)
+            BaseResponse.SuccessResponse("${details.tittle} Has Deleted ", HttpStatusCode.Accepted.toString())
         }
         else  {
             throw SongNotFoundException("Song ${details.tittle} Does Not Exists", HttpStatusCode.BadRequest)

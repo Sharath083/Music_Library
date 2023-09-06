@@ -3,9 +3,6 @@ package com.example.repositories
 import com.example.dao.UserInterface
 import com.example.data.DatabaseFactory
 import com.example.data.model.*
-import com.example.data.schemas.PlayListTable
-import com.example.data.schemas.SongsTable
-import com.example.data.schemas.UserTable
 import com.example.database.table.PlayList
 import com.example.database.table.PlayList.playListName
 import com.example.database.table.PlayList.songId
@@ -37,25 +34,29 @@ class UserInterfaceImpl : UserInterface {
         }
     }
     override suspend fun checkUser(name: String, email: String): Boolean {
-        val data = DatabaseFactory.dbQuery {
-            UserEntity.find { (userName eq name or (gmail eq email))}
-                .map { mapping.resultRowRegisteredUser(it) }
+        return DatabaseFactory.dbQuery {
+            UserEntity.find { (userName eq name or (gmail eq email)) }
+                .toList().isEmpty()
         }
-        return data.isEmpty()
     }
 
-    override suspend fun userLoginCheck(name: String, password: String): UserCheck? {
+    override suspend fun userLoginCheck(input:UserLogin): Boolean {
         return DatabaseFactory.dbQuery {
-            UserEntity.find { userName eq name and (Users.password eq password)}
-                .map { mapping.resultRowRegisteredUser(it) }.firstOrNull()
+            UserEntity.find { (userName eq input.name!! and (password eq input.password!!)) }
+                .toList().isNotEmpty()
         }
+//        return DatabaseFactory.dbQuery {
+//            UserEntity.all()
+//                .map { mapping.mapRegisteredUser(it) }.any { it.name==input.name &&it.password==input.password }
+//        }
+
     }
 
     override suspend fun getUserId(name: String): UUID?{
-        return UserEntity
-                .find { userName eq name}
-                .map { it.id.value }.firstOrNull()
-
+        return DatabaseFactory.dbQuery {
+            UserEntity
+                .find { userName eq name }.map { it.id.value }.firstOrNull()
+        }
     }
 
     override suspend fun filterByArtist(artist: String): List<InputSong> {
@@ -64,47 +65,38 @@ class UserInterfaceImpl : UserInterface {
                 .map {mapping.mapSong(it) }
         }
     }
-    override fun getSongId(song: String): UUID {
-        return SongsEntity.find(Songs.title eq song).map { it.id.value }.first()
+    override  fun getSongId(song: String): UUID? {
+        return SongsEntity.find(Songs.title eq song).toList().firstOrNull()?.id?.value
     }
-    override suspend fun checkSongInPlayList(song: String, playList: String, usersId: UUID): Boolean {
-        DatabaseFactory.dbQuery {
-//            PlayListEntity.all().map { mapping.mapPlayListDetails(it) }.filter {
-//                it.songId==getSongIds(song) && it.playListName==playList && it.userId == usersId
-//            }
-            PlayListEntity.find {
-                songId eq getSongId(song) and(playListName eq playList) and(userId eq usersId)}
-                .map { mapping.mapPlayListDetails(it) }
 
-        }.apply {
-            println(this)
-            return when {
-                this.isEmpty() -> true
-                else -> {
-                    throw SongAlreadyExistsException(
-                        "$song Already  Exists In PlayList $playList", HttpStatusCode.BadRequest)
-                }
-            }
+    override suspend fun checkSongInPlayList(song: String, playList: String, usersId: UUID): Boolean {
+//        return DatabaseFactory.dbQuery {
+//            PlayListEntity.all().map { mapping.mapPlayListDetails(it) }.any {
+//                it.userId.equals(usersId) && it.playListName == playList && it.songId==getSongId(song).toString()
+//            }
+        return DatabaseFactory.dbQuery {
+//            PlayListEntity.find {
+//                println("IN PLAYLIST VHRCK $usersId")
+//                songId eq sId and (playListName eq playList) and (userId eq usersId)
+//            }.toList().isEmpty()
+            PlayList.select{songId eq getSongId(song) and (playListName eq playList) and (userId eq usersId)}.toList().isEmpty()
+//            PlayListEntity.all().toList().map { it.songId.id.value== sId && (it.playListName == playList) && (it.userId.id.value== usersId) }.isEmpty()
+
         }
     }
 
     override suspend fun checkSongInDb(song: String): Boolean {
-
-        DatabaseFactory.dbQuery {
-            SongsEntity.find(Songs.title eq song).map { mapping.mapSong(it) }
-
-
-        }.apply {
-            return if(this.isNotEmpty()){
-                println("true db check")
-                true
-
-            }else{
-                println("exception db check")
-                throw SongNotFoundException("Song $song Does Not Exists In DB",HttpStatusCode.BadRequest)
-            }
+        return DatabaseFactory.dbQuery {
+            SongsEntity.find(Songs.title eq song).toList().isNotEmpty()
         }
     }
+
+    override suspend fun checkPlayList(playList: String, usersId: UUID): Boolean {
+        return DatabaseFactory.dbQuery {
+            PlayList.select { playListName eq playList and(userId eq usersId) }.toList().isEmpty()
+        }
+    }
+
     fun getSongIds(song: String): SongsEntity {
         return SongsEntity.find(Songs.title eq song).map { it }.first()
     }
@@ -114,42 +106,52 @@ class UserInterfaceImpl : UserInterface {
                 .map { it}.first()
 
     }
-    override suspend fun addToPlayList(details: AddToPlayList, usersId: UUID) {
-        DatabaseFactory.dbQuery {
+    override suspend fun addToPlayList(details: AddToPlayList, usersId: UUID):Boolean{
+        val insert=DatabaseFactory.dbQuery {
 //            PlayListEntity.new {
 //                userId=getUserIds(usersId)
 //                playListName= details.playList!!
 //                songId= getSongIds(details.song!!)
 //            }
+
             PlayList.insert {
                 it[userId]=usersId
                 it[playListName]= details.playList!!
-                it[songId]= getSongId(details.song!!)
+                it[songId]= getSongId(details.song!!)!!
             }
         }
+        return insert.resultedValues!!.toList().isNotEmpty()
+
+
     }
 
     override suspend fun removeFromPlayList(details: RemoveFromPlayList, usersId: UUID): Boolean {
-            return  DatabaseFactory.dbQuery {
+        return  DatabaseFactory.dbQuery {
                 PlayList.deleteWhere{
-                    songId eq getSongId(details.song!!) and (userId eq usersId) and (playListName eq details.playList!!)
+                    songId eq getSongId(details.song!!)and (userId eq usersId) and (playListName eq details.playList!!)
                 }
             }>0
     }
-    override suspend fun viewPlayList(playListName: String, userId: UUID): List<InputSong> {
-        DatabaseFactory.dbQuery {
-            PlayList.innerJoin(Songs)
-                .select(PlayList.playListName eq playListName and (PlayList.userId eq userId))
-        }.apply {
-            return SongsEntity.wrapRows(this).map { mapping.mapSong(it) }
-        }
 
+    override suspend fun deletePlayList(playList: String, usersId: UUID): Boolean {
+        return DatabaseFactory.dbQuery {
+            PlayList.deleteWhere { playListName eq playList and (userId eq usersId) }
+        }>0
+    }
+
+    override suspend fun viewPlayList(playList: String, userId: UUID): List<InputSong> {
+        return DatabaseFactory.dbQuery {
+            val query=PlayList.innerJoin(Songs)
+                .select{playListName eq playList and (PlayList.userId eq userId)}
+            SongsEntity.wrapRows(query).map { mapping.mapSong(it) }
+        }
         }
     override suspend fun deleteAccount(userId: UUID) {
         DatabaseFactory.dbQuery {
-            val playListData=PlayListEntity.findById(userId)?:throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
+            println(userId)
+            PlayList.deleteWhere {PlayList.userId eq userId }?:throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
             val userData=UserEntity.findById(userId)?:throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
-            playListData.delete()
+//            playListData.delete()
             userData.delete()
 
         }

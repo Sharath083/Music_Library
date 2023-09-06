@@ -1,16 +1,15 @@
 package com.example.utils.appconstant
 
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Unknown
 
 object InfoMessage {
-    const val SESSION_MESSAGE = "Session Has Expired .PLEASE LOGIN AGAIN"
+    const val SESSION_MESSAGE = "Session Has Expired.Please Login Again TO Access This Page"
     const val INVALID_LOGIN_DETAILS = "Give Proper UserName and Password"
 
     const val INVALID_NAME="Name field should not be empty"
     const val INVALID_PASSWORD="Password field should not be empty"
     const val INVALID_EMAIL="Email field should not be empty "
     const val INVALID_EMAIL_FORMAT="Invalid email address format"
-    const val UNKNOWN_ERROR="Something Went Wrong"
+    const val UNKNOWN_ERROR="Something Went Wrong SP"
 
 
 

@@ -6,8 +6,10 @@ import com.example.data.model.UserId
 import com.example.repositories.InterfaceUserImpl
 import com.example.service.UserServices
 import com.example.utils.SessionDataIsNullException
+import com.example.utils.SomethingWentWrongException
 import com.example.utils.appconstant.APIEndPoints.ADD_TO_PLAYLIST
 import com.example.utils.appconstant.APIEndPoints.DELETE_ACCOUNT
+import com.example.utils.appconstant.APIEndPoints.DELETE_PLAYLIST
 import com.example.utils.appconstant.APIEndPoints.FILTER_BY_ARTIST
 import com.example.utils.appconstant.APIEndPoints.REMOVE_FROM_PLAYLIST
 import com.example.utils.appconstant.APIEndPoints.USER_LOGIN
@@ -22,6 +24,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import org.koin.ktor.ext.inject
+import java.lang.reflect.InvocationTargetException
 
 fun Route.userRouting(){
     val userServices: UserServices by inject()
@@ -34,14 +37,13 @@ fun Route.userRouting(){
         }
         post (USER_LOGIN){
             val input=call.receive<UserLogin>()
-            userServices.userLoginCheckService(input.name!!,input.password!!)
+            userServices.userLoginCheckService(input)
                 .apply {
-                    val id = userServices.getUserIdService(input.name)
-                    call.sessions.set(UserId(id))
+                    userServices.getUserIdService(input.name!!).apply {
+                        call.sessions.set(UserId(this))
+                    }
                     call.respond(HttpStatusCode.Created, this)
                 }
-
-
         }
         get(FILTER_BY_ARTIST) {
             val input = call.receive<ArtistData>()
@@ -53,28 +55,40 @@ fun Route.userRouting(){
         }
 
         post(ADD_TO_PLAYLIST) {
+
             val input = call.receive<AddToPlayList>()
-            val sessionData=call.sessions.get<UserId>()
-                ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            userServices.addToPlayList(input, sessionData.userId!!)
+            val sessionData = call.sessions.get<UserId>()
+                ?: throw SessionDataIsNullException(SESSION_MESSAGE, HttpStatusCode.Unauthorized)
+            userServices.addSongToPlayListService(input, sessionData.userId)
                 .apply {
-                    call.respond(HttpStatusCode.OK,this) }
+                    call.respond(HttpStatusCode.OK, this)
+                }
+
         }
         post(REMOVE_FROM_PLAYLIST) {
             val input = call.receive<RemoveFromPlayList>()
             val sessionData=call.sessions.get<UserId>()
                 ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            userServices.removeFromPlayListService(input, sessionData.userId!!)
+            userServices.removeFromPlayListService(input, sessionData.userId)
                 .apply {
                     call.respond(HttpStatusCode.OK,this) }
         }
 
         get(VIEW_PLAYLIST) {
             val input = call.receive<ViewPlayList>()
-            val sessionData=call.sessions.get<UserId>()?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            userServices.viewPlayListService(input.playlistName!!, sessionData.userId!!)
+            val sessionData=call.sessions.get<UserId>()
+                ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
+            userServices.viewPlayListService(input.playlistName!!, sessionData.userId)
                 .apply {
-                    call.respond(HttpStatusCode.OK,this) }        }
+                    call.respond(HttpStatusCode.OK,this) }
+        }
+        post(DELETE_PLAYLIST) {
+            val input = call.receive<ViewPlayList>()
+            val sessionData=call.sessions.get<UserId>()?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
+            userServices.deletePlayListService(input.playlistName!!, sessionData.userId)
+                .apply {
+                    call.respond(HttpStatusCode.OK,this) }
+        }
 
         post(USER_LOGOUT){
             call.sessions.clear<UserId>()
@@ -84,7 +98,7 @@ fun Route.userRouting(){
         delete(DELETE_ACCOUNT) {
             val input=call.sessions.get<UserId>()
                 ?:throw SessionDataIsNullException(SESSION_MESSAGE,HttpStatusCode.Unauthorized)
-            userServices.deleteAccountService(input.userId!!)
+            userServices.deleteAccountService(input.userId)
                 .apply {
                     call.sessions.clear<UserId>()
                     call.respond(HttpStatusCode.OK,this)

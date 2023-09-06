@@ -22,9 +22,8 @@ class Mapping {
     fun mapSongData(row:SongsEntity): SongDatas {
         return SongDatas(row.id.value.toString(),row.title,row.artist,row.duration)
     }
-    fun resultRowRegisteredUser(row: UserEntity): UserCheck {
+    fun mapRegisteredUser(row: UserEntity): UserCheck {
         return  UserCheck(row.userName,row.gmail,row.password)
-
     }
     fun mapPlayListDetails(row:PlayListEntity): PlayListDatas {
         return PlayListDatas(row.userId.id.value.toString(),row.playListName,row.songId.id.value.toString())

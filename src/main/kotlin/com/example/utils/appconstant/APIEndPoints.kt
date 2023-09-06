@@ -18,4 +18,6 @@ object APIEndPoints {
     const val DELETE_ACCOUNT="/deleteAccount"
     const val FILTER_BY_ARTIST="/filterByArtist"
     const val VIEW_PLAYLIST="/viewPlayList"
+    const val DELETE_PLAYLIST="/deletePlayList"
+
 }

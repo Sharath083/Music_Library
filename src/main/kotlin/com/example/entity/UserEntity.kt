@@ -1,7 +1,6 @@
 package com.example.entity
 
-import com.example.data.schemas.SongsTable
-import com.example.database.table.Songs
+
 import com.example.database.table.Users
 import org.jetbrains.exposed.dao.UUIDEntity
 import org.jetbrains.exposed.dao.UUIDEntityClass

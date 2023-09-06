@@ -1,6 +1,6 @@
 package com.example.plugins
 
-import com.example.data.model.ExceptionResponse
+import com.example.data.model.BaseResponse
 import com.example.utils.*
 import com.example.utils.appconstant.InfoMessage
 import io.ktor.http.*
@@ -11,9 +11,9 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import java.sql.SQLException
 import java.util.InputMismatchException
 
-fun statusHelper(message:String,msgId:Int, status:String):ExceptionResponse{
-    return ExceptionResponse(message,msgId,status)
-}
+//fun statusHelper(message:String,msgId:Int, status:String):ExceptionResponse{
+//    return ExceptionResponse(message,msgId,status)
+//}
 fun Application.configureStatusPages() {
     install(StatusPages) {
         var statusCode:HttpStatusCode
@@ -125,7 +125,7 @@ fun Application.configureStatusPages() {
                     status=statusCode.toString()
                 }
             }
-            call.respond(statusCode,ExceptionResponse(
+            call.respond(statusCode,BaseResponse.ExceptionResponse(
                 response = message,
                 msgId = statusCode.value,
                 status = status
@@ -162,7 +162,7 @@ fun Application.configureStatusPages() {
                     status=statusCode.toString()
                 }
             }
-                call.respond(statusCode,ExceptionResponse(
+                call.respond(statusCode,BaseResponse.ExceptionResponse(
                     response = message,
                     msgId = statusCode.value,
                     status = status
@@ -170,7 +170,7 @@ fun Application.configureStatusPages() {
         }
         exception<ExposedSQLException>{ call, cause->
             call.respond(
-                HttpStatusCode.InternalServerError,ExceptionResponse(
+                HttpStatusCode.InternalServerError,BaseResponse.ExceptionResponse(
                 response = "$cause",
                 msgId = HttpStatusCode.InternalServerError.value,
                 status = HttpStatusCode.InternalServerError.toString()

@@ -1,6 +1,7 @@
 package com.example.data
 
 
+import com.example.config.DBData
 import com.example.database.table.PlayList
 import com.example.database.table.Songs
 import com.example.database.table.Users
@@ -13,21 +14,17 @@ import java.util.*
 
 object DatabaseFactory {
     fun init(){
-        val url = "jdbc:postgresql://localhost:5432/musicLibrary"
-        val driver = "org.postgresql.Driver"
-        val user = "postgres"
-        val password = "root"
+        val url = DBData.url
+        val driver = DBData.driver
+        val user = DBData.user
+        val password = DBData.password
         Database.connect(url, driver, user, password)
         transaction {
-            SchemaUtils.createMissingTablesAndColumns(PlayList)
-            SchemaUtils.createMissingTablesAndColumns(Songs)
-            SchemaUtils.createMissingTablesAndColumns(Users)        }
+            SchemaUtils.createMissingTablesAndColumns(PlayList,Songs,Users)
+        }
     }
 
-
-
-
-    suspend fun <T> dbQuery(block: () -> T):T=newSuspendedTransaction(Dispatchers.IO){
+    suspend fun <T> dbQuery(block: () -> T):T= newSuspendedTransaction(Dispatchers.IO){
         block()
     }
 }
