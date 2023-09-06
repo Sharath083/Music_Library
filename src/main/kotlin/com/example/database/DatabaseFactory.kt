@@ -1,4 +1,4 @@
-package com.example.data
+package com.example.database
 
 
 import com.example.config.DBData
@@ -10,7 +10,6 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
 
 object DatabaseFactory {
     fun init(){
@@ -20,7 +19,7 @@ object DatabaseFactory {
         val password = DBData.password
         Database.connect(url, driver, user, password)
         transaction {
-            SchemaUtils.createMissingTablesAndColumns(PlayList,Songs,Users)
+            SchemaUtils.createMissingTablesAndColumns(PlayList, Songs, Users)
         }
     }
 

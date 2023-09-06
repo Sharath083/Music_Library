@@ -1,13 +1,11 @@
 package com.example.service
-import com.example.data.model.BaseResponse
-import com.example.data.model.*
+import com.example.exceptions.*
+import com.example.model.*
 
 import com.example.repositories.UserInterfaceImpl
-import com.example.utils.*
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.lang.reflect.InvocationTargetException
 import java.util.*
 
 class UserServices : KoinComponent {
@@ -32,7 +30,7 @@ class UserServices : KoinComponent {
             }
         }
     }
-    suspend fun userLoginCheckService(input: UserLogin):BaseResponse{
+    suspend fun userLoginCheckService(input: UserLogin): BaseResponse {
         return if (userInterfaceImpl.userLoginCheck(input)) {
             BaseResponse.SuccessResponse("Login Success", HttpStatusCode.Accepted.toString())
         } else {
@@ -61,7 +59,7 @@ class UserServices : KoinComponent {
             }
         }
     }
-    suspend fun addSongToPlayListService(details: AddToPlayList, usersId:UUID): BaseResponse{
+    suspend fun addSongToPlayListService(details: AddToPlayList, usersId:UUID): BaseResponse {
 
         return if (!userInterfaceImpl.checkSongInDb(details.song!!)) {
             println("Not in DB")
@@ -124,7 +122,7 @@ class UserServices : KoinComponent {
 //
 //    }
 
-    suspend fun removeFromPlayListService(details: RemoveFromPlayList,usersId:UUID): SuccessResponse {
+    suspend fun removeFromPlayListService(details: RemoveFromPlayList, usersId:UUID): SuccessResponse {
         return when {
             userInterfaceImpl.checkPlayList(details.playList!!,usersId)->
                 throw PlayListNotFoundException("${details.playList} Does Not Exists", HttpStatusCode.BadRequest)
@@ -145,10 +143,10 @@ class UserServices : KoinComponent {
 
         }
     }
-    suspend fun deletePlayListService(playList: String, userId: UUID):BaseResponse{
+    suspend fun deletePlayListService(playList: String, userId: UUID): BaseResponse {
         userInterfaceImpl.deletePlayList(playList,userId).apply {
             return when{
-                this->BaseResponse.SuccessResponse("$playList Is Deleted", HttpStatusCode.Accepted.toString())
+                this-> BaseResponse.SuccessResponse("$playList Is Deleted", HttpStatusCode.Accepted.toString())
                 userInterfaceImpl.checkPlayList(playList,userId)->
                     throw PlayListNotFoundException("$playList Does Not Exists", HttpStatusCode.BadRequest)
 
@@ -157,7 +155,7 @@ class UserServices : KoinComponent {
 
         }
     }
-    suspend fun viewPlayListService(playList: String, userId: UUID): OutputList<List<InputSong>>{
+    suspend fun viewPlayListService(playList: String, userId: UUID): OutputList<List<InputSong>> {
         userInterfaceImpl.viewPlayList(playList,userId).apply {
             return when {
                 this.isNotEmpty()->
@@ -167,7 +165,7 @@ class UserServices : KoinComponent {
             }
         }
     }
-    suspend fun deleteAccountService(userId: UUID):SuccessResponse{
+    suspend fun deleteAccountService(userId: UUID): SuccessResponse {
         userInterfaceImpl.deleteAccount(userId).apply {
             return SuccessResponse("Account Has Deleted",HttpStatusCode.Accepted.toString())
         }

@@ -1,6 +1,5 @@
 package com.example.entity
 
-import com.example.data.schemas.SongsTable
 import com.example.database.table.Songs
 import org.jetbrains.exposed.dao.id.EntityID
 

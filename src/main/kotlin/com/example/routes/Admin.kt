@@ -4,11 +4,9 @@ import com.example.utils.appconstant.APIEndPoints.ADD_NEW_SONG
 import com.example.utils.appconstant.APIEndPoints.ADMIN_LOGIN
 import com.example.utils.appconstant.APIEndPoints.ADMIN_ROUTES
 import com.example.utils.appconstant.APIEndPoints.REMOVE_SONG
-import com.example.data.model.AdminLogin
-import com.example.data.model.DeleteSong
-import com.example.data.model.InputSong
-import com.example.repositories.AdminInterfaceImpl
-import com.example.repositories.InterfaceAdminImpl
+import com.example.model.AdminLogin
+import com.example.model.DeleteSong
+import com.example.model.InputSong
 import com.example.service.AdminServices
 import io.ktor.http.*
 import io.ktor.server.application.*

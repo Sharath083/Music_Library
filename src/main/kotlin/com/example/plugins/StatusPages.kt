@@ -1,7 +1,7 @@
 package com.example.plugins
 
-import com.example.data.model.BaseResponse
-import com.example.utils.*
+import com.example.exceptions.*
+import com.example.model.BaseResponse
 import com.example.utils.appconstant.InfoMessage
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -24,97 +24,97 @@ fun Application.configureStatusPages() {
 
         exception<Exception>{ call, cause ->
             when(cause){
-                is InvalidNameException->{
+                is InvalidNameException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_NAME
                     status=cause.statusCode.toString()                }
-                is InvalidArtistException->{
+                is InvalidArtistException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_Artist_Name
                     status=cause.statusCode.toString()
                 }
-                is InvalidSongException->{
+                is InvalidSongException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_SONG_NAME
                     status=cause.statusCode.toString()
                 }
-                is InvalidDurationException->{
+                is InvalidDurationException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_DURATION
                     status=cause.statusCode.toString()
                 }
-                is InvalidPlayListException->{
+                is InvalidPlayListException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.PLAYLIST_NOT_VALID
                     status=cause.statusCode.toString()
                 }
-                is InvalidEmailFormatException->{
+                is InvalidEmailFormatException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_EMAIL_FORMAT
                     status=cause.statusCode.toString()
                 }
-                is InvalidEmailException->{
+                is InvalidEmailException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_EMAIL
                     status=cause.statusCode.toString()
                 }
-                is InvalidPasswordException->{
+                is InvalidPasswordException ->{
                     statusCode=cause.statusCode
                     message= InfoMessage.INVALID_PASSWORD
                     status=cause.statusCode.toString()
                 }
                 //Routes Exceptions
-                is InvalidLoginForAdminException->{
+                is InvalidLoginForAdminException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is SomethingWentWrongException->{
+                is SomethingWentWrongException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is SongAlreadyExistsException->{
+                is SongAlreadyExistsException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is SongNotFoundException->{
+                is SongNotFoundException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is UserDoesNotExistsException->{
+                is UserDoesNotExistsException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is InvalidUserNameOrPasswordException->{
+                is InvalidUserNameOrPasswordException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is PlayListNotFoundException->{
+                is PlayListNotFoundException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is UserAlreadyExistsException->{
+                is UserAlreadyExistsException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is ArtistDoesNotExistsException->{
+                is ArtistDoesNotExistsException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is SessionDataIsNullException->{
+                is SessionDataIsNullException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
                 }
-                is InvalidTokenException->{
+                is InvalidTokenException ->{
                     statusCode=cause.statusCode
                     message= cause.msg
                     status=cause.statusCode.toString()
@@ -125,7 +125,7 @@ fun Application.configureStatusPages() {
                     status=statusCode.toString()
                 }
             }
-            call.respond(statusCode,BaseResponse.ExceptionResponse(
+            call.respond(statusCode, BaseResponse.ExceptionResponse(
                 response = message,
                 msgId = statusCode.value,
                 status = status
@@ -162,7 +162,7 @@ fun Application.configureStatusPages() {
                     status=statusCode.toString()
                 }
             }
-                call.respond(statusCode,BaseResponse.ExceptionResponse(
+                call.respond(statusCode, BaseResponse.ExceptionResponse(
                     response = message,
                     msgId = statusCode.value,
                     status = status
@@ -170,7 +170,7 @@ fun Application.configureStatusPages() {
         }
         exception<ExposedSQLException>{ call, cause->
             call.respond(
-                HttpStatusCode.InternalServerError,BaseResponse.ExceptionResponse(
+                HttpStatusCode.InternalServerError, BaseResponse.ExceptionResponse(
                 response = "$cause",
                 msgId = HttpStatusCode.InternalServerError.value,
                 status = HttpStatusCode.InternalServerError.toString()

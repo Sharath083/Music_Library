@@ -1,6 +1,6 @@
 package com.example
 
-import com.example.data.model.AdminLogin
+import com.example.model.AdminLogin
 import com.example.utils.appconstant.APIEndPoints.ADMIN_LOGIN
 import io.ktor.client.request.*
 import io.ktor.http.*

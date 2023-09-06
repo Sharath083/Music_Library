@@ -1,12 +1,9 @@
 package com.example.routes
 
 import com.example.utils.appconstant.InfoMessage.SESSION_MESSAGE
-import com.example.data.model.*
-import com.example.data.model.UserId
-import com.example.repositories.InterfaceUserImpl
+import com.example.model.*
 import com.example.service.UserServices
-import com.example.utils.SessionDataIsNullException
-import com.example.utils.SomethingWentWrongException
+import com.example.exceptions.SessionDataIsNullException
 import com.example.utils.appconstant.APIEndPoints.ADD_TO_PLAYLIST
 import com.example.utils.appconstant.APIEndPoints.DELETE_ACCOUNT
 import com.example.utils.appconstant.APIEndPoints.DELETE_PLAYLIST
@@ -24,7 +21,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import org.koin.ktor.ext.inject
-import java.lang.reflect.InvocationTargetException
 
 fun Route.userRouting(){
     val userServices: UserServices by inject()
@@ -92,7 +88,7 @@ fun Route.userRouting(){
 
         post(USER_LOGOUT){
             call.sessions.clear<UserId>()
-            call.respond(HttpStatusCode.OK,SuccessResponse("Logout Success",HttpStatusCode.Accepted.toString()))
+            call.respond(HttpStatusCode.OK, SuccessResponse("Logout Success",HttpStatusCode.Accepted.toString()))
         }
 
         delete(DELETE_ACCOUNT) {

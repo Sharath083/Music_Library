@@ -1,8 +1,8 @@
 package com.example.dao
 
-import com.example.data.model.DeleteSong
-import com.example.data.model.InputSong
-import com.example.data.model.SuccessResponse
+import com.example.model.DeleteSong
+import com.example.model.InputSong
+import com.example.model.SuccessResponse
 import java.util.UUID
 
 interface AdminInterface {

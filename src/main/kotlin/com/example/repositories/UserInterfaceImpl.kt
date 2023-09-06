@@ -1,8 +1,7 @@
 package com.example.repositories
 
 import com.example.dao.UserInterface
-import com.example.data.DatabaseFactory
-import com.example.data.model.*
+import com.example.database.DatabaseFactory
 import com.example.database.table.PlayList
 import com.example.database.table.PlayList.playListName
 import com.example.database.table.PlayList.songId
@@ -12,10 +11,10 @@ import com.example.database.table.Users
 import com.example.database.table.Users.gmail
 import com.example.database.table.Users.password
 import com.example.database.table.Users.userName
-import com.example.entity.PlayListEntity
 import com.example.entity.SongsEntity
 import com.example.entity.UserEntity
-import com.example.utils.*
+import com.example.exceptions.UserDoesNotExistsException
+import com.example.model.*
 import com.example.utils.helperfunctions.Mapping
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
@@ -40,7 +39,7 @@ class UserInterfaceImpl : UserInterface {
         }
     }
 
-    override suspend fun userLoginCheck(input:UserLogin): Boolean {
+    override suspend fun userLoginCheck(input: UserLogin): Boolean {
         return DatabaseFactory.dbQuery {
             UserEntity.find { (userName eq input.name!! and (password eq input.password!!)) }
                 .toList().isNotEmpty()
@@ -107,7 +106,7 @@ class UserInterfaceImpl : UserInterface {
 
     }
     override suspend fun addToPlayList(details: AddToPlayList, usersId: UUID):Boolean{
-        val insert=DatabaseFactory.dbQuery {
+        val insert= DatabaseFactory.dbQuery {
 //            PlayListEntity.new {
 //                userId=getUserIds(usersId)
 //                playListName= details.playList!!

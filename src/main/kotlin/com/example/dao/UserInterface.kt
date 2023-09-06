@@ -1,12 +1,13 @@
 package com.example.dao
 
 import com.example.data.model.*
+import com.example.model.*
 import java.util.UUID
 
 interface UserInterface {
     suspend fun userRegistration(details: UserRegistration)
     suspend fun checkUser(name: String, email: String): Boolean
-    suspend fun userLoginCheck(input:UserLogin): Boolean
+    suspend fun userLoginCheck(input: UserLogin): Boolean
     suspend fun getUserId(name: String): UUID?
 
     suspend fun filterByArtist(artist:String):List<InputSong>

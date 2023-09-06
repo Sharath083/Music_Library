@@ -1,16 +1,22 @@
 package com.example.plugins
 
-import com.example.data.model.*
+import com.example.exceptions.*
+import com.example.model.*
+import com.example.repositories.AdminInterfaceImpl
 import com.example.service.UserServices
-import com.example.utils.*
+import com.example.utils.helperfunctions.HelperMethods
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
+import org.koin.core.component.inject
+import org.koin.ktor.ext.inject
 
 fun Application.configureRequestValidation(){
 
 
     install(RequestValidation){
+        val helperFunction by inject<HelperMethods>()
+
         validate<DeleteSong> {
             when{
                 it.artist.isNullOrBlank()->throw InvalidArtistException(HttpStatusCode.BadRequest)
@@ -59,7 +65,7 @@ fun Application.configureRequestValidation(){
                 it.name.isNullOrBlank()->throw InvalidNameException(HttpStatusCode.BadRequest)
                 it.password.isNullOrBlank()->throw InvalidPasswordException(HttpStatusCode.BadRequest)
                 it.email.isNullOrBlank()->throw InvalidEmailException(HttpStatusCode.BadRequest)
-                !UserServices().isValidEmail(it.email)->throw InvalidEmailFormatException(HttpStatusCode.BadRequest)
+                !helperFunction.isValidEmail(it.email)->throw InvalidEmailFormatException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
 
