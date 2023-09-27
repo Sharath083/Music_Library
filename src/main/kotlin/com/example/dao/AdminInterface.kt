@@ -10,7 +10,7 @@ interface AdminInterface {
     suspend fun checkSong(song: String,artist:String):Boolean
     suspend fun addSong(details: InputSong): Boolean
     suspend fun getSongId(details: DeleteSong):UUID?
-    suspend fun deleteSong(details: DeleteSong)
+    suspend fun deleteSong(details: DeleteSong):Boolean
 
 
 

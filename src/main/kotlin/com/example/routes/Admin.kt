@@ -19,26 +19,29 @@ import org.koin.ktor.ext.inject
 fun Route.adminFunctions(){
     val adminServices: AdminServices by inject()
     route(ADMIN_ROUTES){
-
         post(ADMIN_LOGIN) {
             val input=call.receive<AdminLogin>()
             adminServices.adminLoginService(input.name!!,input.password!!)
-                .apply { call.respond(HttpStatusCode.Created, this)}
+                .apply {
+                    call.respond(HttpStatusCode.OK, this)
+                }
 
         }
-        authenticate("Admin") {
+//        authenticate("Admin") {
             post(ADD_NEW_SONG) {
                 val input = call.receive<InputSong>()
                 adminServices.songAddService(input)
                     .apply { call.respond(HttpStatusCode.Accepted, this)}
             }
+
+
             delete(REMOVE_SONG) {
                 val input = call.receive<DeleteSong>()
                 adminServices.deleteSongService(input)
                     .apply { call.respond(HttpStatusCode.Accepted, this)}
             }
         }
-    }
+//    }
 
 }
 

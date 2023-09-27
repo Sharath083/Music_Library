@@ -1,7 +1,7 @@
 package com.example.utils.appconstant
 
 object APIEndPoints {
-    const val ADMIN_ROUTES="admin"
+    const val ADMIN_ROUTES="/admin"
     const val ADMIN_LOGIN="/login"
     const val ADD_NEW_SONG="/addNewSong"
     const val REMOVE_SONG="/removeSong"

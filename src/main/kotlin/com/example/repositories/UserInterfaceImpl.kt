@@ -11,8 +11,11 @@ import com.example.database.table.Users
 import com.example.database.table.Users.gmail
 import com.example.database.table.Users.password
 import com.example.database.table.Users.userName
+import com.example.entity.PlayListEntity
 import com.example.entity.SongsEntity
 import com.example.entity.UserEntity
+import com.example.exceptions.SomethingWentWrongException
+import com.example.exceptions.SongNotFoundException
 import com.example.exceptions.UserDoesNotExistsException
 import com.example.model.*
 import com.example.utils.helperfunctions.Mapping
@@ -23,14 +26,16 @@ import java.util.*
 
 class UserInterfaceImpl : UserInterface {
     private val mapping=Mapping()
-    override suspend fun userRegistration(details: UserRegistration) {
+
+    override suspend fun userRegistration(details: UserRegistration):UserCheck {
         DatabaseFactory.dbQuery {
             UserEntity.new {
                 userName = details.name!!
                 gmail= details.email!!
                 password = details.password!!
             }
-        }
+        }.apply {
+            return Mapping().mapRegisteredUser(this) }
     }
     override suspend fun checkUser(name: String, email: String): Boolean {
         return DatabaseFactory.dbQuery {
@@ -66,6 +71,7 @@ class UserInterfaceImpl : UserInterface {
     }
     override  fun getSongId(song: String): UUID? {
         return SongsEntity.find(Songs.title eq song).toList().firstOrNull()?.id?.value
+            ?:throw SongNotFoundException("Song Does Not Exists", HttpStatusCode.BadRequest)
     }
 
     override suspend fun checkSongInPlayList(song: String, playList: String, usersId: UUID): Boolean {
@@ -96,8 +102,8 @@ class UserInterfaceImpl : UserInterface {
         }
     }
 
-    fun getSongIds(song: String): SongsEntity {
-        return SongsEntity.find(Songs.title eq song).map { it }.first()
+    fun getSongIds(song: String): UUID {
+        return SongsEntity.find(Songs.title eq song).map { it }.first().id.value
     }
     fun getUserIds(id: UUID):UserEntity {
             return UserEntity
@@ -108,7 +114,7 @@ class UserInterfaceImpl : UserInterface {
     override suspend fun addToPlayList(details: AddToPlayList, usersId: UUID):Boolean{
         val insert= DatabaseFactory.dbQuery {
 //            PlayListEntity.new {
-//                userId=getUserIds(usersId)
+//                userId=Users.select(Users.id eq usersId).map { it. }
 //                playListName= details.playList!!
 //                songId= getSongIds(details.song!!)
 //            }
@@ -116,7 +122,7 @@ class UserInterfaceImpl : UserInterface {
             PlayList.insert {
                 it[userId]=usersId
                 it[playListName]= details.playList!!
-                it[songId]= getSongId(details.song!!)!!
+                it[songId]= getSongId(details.song!!)?:throw SongNotFoundException("Song Does Not Exists", HttpStatusCode.BadRequest)
             }
         }
         return insert.resultedValues!!.toList().isNotEmpty()
@@ -144,15 +150,16 @@ class UserInterfaceImpl : UserInterface {
                 .select{playListName eq playList and (PlayList.userId eq userId)}
             SongsEntity.wrapRows(query).map { mapping.mapSong(it) }
         }
-        }
-    override suspend fun deleteAccount(userId: UUID) {
-        DatabaseFactory.dbQuery {
-            println(userId)
-            PlayList.deleteWhere {PlayList.userId eq userId }?:throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
-            val userData=UserEntity.findById(userId)?:throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
+    }
+    override suspend fun deleteAccount(userId: UUID):Boolean {
+        return DatabaseFactory.dbQuery {
+//            val playListData=PlayListEntity.findById(userId)?:throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
+            PlayList.deleteWhere {PlayList.userId eq userId }
+            Users.deleteWhere { id eq userId }
+//            val userData=UserEntity.findById(userId)?:throw UserDoesNotExistsException("Invalid UserName Or Password",HttpStatusCode.BadRequest)
 //            playListData.delete()
-            userData.delete()
+//            userData.delete()
 
-        }
+        }>0
     }
 }

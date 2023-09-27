@@ -7,13 +7,20 @@ import com.example.model.InputSong
 import com.example.database.table.Songs
 import com.example.entity.SongsEntity
 import com.example.exceptions.SongNotFoundException
+import com.example.utils.helperfunctions.HelperMethods
+import com.example.utils.helperfunctions.Mapping
 import io.ktor.http.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.koin.core.component.KoinComponent
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
 import java.util.UUID
 
 class AdminInterfaceImpl : AdminInterface {
     override fun adminLoginCheck(name: String, password: String): Boolean {
-        return name==("admin") && password=="1234"
+        return name == "admin" && password == "1234"
     }
 
     override suspend fun checkSong(song: String, artist: String): Boolean {
@@ -25,19 +32,17 @@ class AdminInterfaceImpl : AdminInterface {
     }
 
     override suspend fun addSong(details: InputSong): Boolean {
-        return if (!checkSong(details.tittle!!,details.artist!!)) {
-            DatabaseFactory.dbQuery {
-                SongsEntity.new {
-                    title = details.tittle
-                    artist = details.artist
-                    duration= details.duration!!
-                }
+        DatabaseFactory.dbQuery {
+            SongsEntity.new {
+                title = details.song!!
+                artist = details.artist!!
+                duration = details.duration!!
             }
-            true
-        } else {
-            false
+        }.apply {
+            return this.artist.isNotEmpty()
         }
     }
+
     override suspend fun getSongId(details: DeleteSong):UUID? {
         return DatabaseFactory.dbQuery {
             SongsEntity.find { Songs.artist eq details.artist!! and (Songs.title eq details.tittle!!) }
@@ -46,11 +51,10 @@ class AdminInterfaceImpl : AdminInterface {
     }
 
 
-    override suspend fun deleteSong(details: DeleteSong) {
+    override suspend fun deleteSong(details: DeleteSong):Boolean {
         val songId=getSongId(details)
-        DatabaseFactory.dbQuery {
-            val query=SongsEntity.findById(songId!!)?:throw SongNotFoundException("Song ${details.tittle} Does Not Exists In DB",HttpStatusCode.BadRequest)
-            query.delete()
-            }
+        return DatabaseFactory.dbQuery {
+            Songs.deleteWhere{id eq songId}
+            }>0
     }
 }

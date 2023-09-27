@@ -27,7 +27,7 @@ fun Application.configureRequestValidation(){
         validate<InputSong> {
             when{
                 it.artist.isNullOrBlank()->throw InvalidArtistException(HttpStatusCode.BadRequest)
-                it.tittle.isNullOrBlank()->throw InvalidSongException(HttpStatusCode.BadRequest)
+                it.song.isNullOrBlank()->throw InvalidSongException(HttpStatusCode.BadRequest)
                 it.duration.isNullOrBlank()->throw InvalidDurationException(HttpStatusCode.BadRequest)
                 else->ValidationResult.Valid
             }
